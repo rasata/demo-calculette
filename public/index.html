@@ -9,13 +9,14 @@
 <body>
   <div class="container">
     <h1>Calculatrice Scientifique</h1>
-    <div class="calculator">
-      <div class="display">
-        <div id="history" class="history"></div>
-        <div id="screen" class="screen">0</div>
-      </div>
-      
-      <div class="buttons">
+    <div class="calculator-wrapper">
+      <div class="calculator">
+        <div class="display">
+          <div id="history" class="history"></div>
+          <div id="screen" class="screen">0</div>
+        </div>
+        
+        <div class="buttons">
         <!-- Première rangée - Fonctions scientifiques -->
         <button class="btn function" data-value="clear">C</button>
         <button class="btn function" data-value="negate">±</button>
@@ -44,6 +45,7 @@
         <button class="btn number zero" data-value="0">0</button>
         <button class="btn number" data-value=".">.</button>
         <button class="btn equals" data-value="=">=</button>
+      </div>
       </div>
       
       <!-- Fonctions scientifiques supplémentaires -->

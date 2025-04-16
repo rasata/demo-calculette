@@ -15,9 +15,15 @@ body {
 
 .container {
   width: 100%;
-  max-width: 375px;
+  max-width: 700px;
   margin: 0 auto;
   padding: 20px;
+}
+
+.calculator-wrapper {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
 }
 
 h1 {
@@ -32,6 +38,7 @@ h1 {
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  width: 320px;
 }
 
 .display {
@@ -65,7 +72,12 @@ h1 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1px;
-  margin-top: 1px;
+  background-color: #1c1c1e;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  height: fit-content;
+  width: 240px;
 }
 
 .btn {
@@ -112,9 +124,25 @@ h1 {
 }
 
 /* Responsive design */
+@media (max-width: 700px) {
+  .calculator-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .scientific-buttons {
+    width: 320px;
+    margin-top: 20px;
+  }
+}
+
 @media (max-width: 400px) {
   .container {
     padding: 10px;
+  }
+  
+  .calculator, .scientific-buttons {
+    width: 100%;
   }
   
   .btn {
