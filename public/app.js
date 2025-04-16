@@ -1,5 +1,30 @@
 document.addEventListener('DOMContentLoaded', function() {
-  // Éléments DOM
+  // Gestion de la navigation entre les modules
+  const sidebarItems = document.querySelectorAll('.sidebar-item');
+  
+  // Ajouter un écouteur d'événement à chaque élément de la barre latérale
+  sidebarItems.forEach(item => {
+    item.addEventListener('click', function() {
+      // Retirer la classe active de tous les éléments
+      sidebarItems.forEach(i => i.classList.remove('active'));
+      
+      // Ajouter la classe active à l'élément cliqué
+      this.classList.add('active');
+      
+      // Récupérer le module à afficher
+      const moduleId = this.getAttribute('data-module');
+      
+      // Masquer tous les modules
+      document.querySelectorAll('.module-container').forEach(module => {
+        module.classList.remove('active');
+      });
+      
+      // Afficher le module sélectionné
+      document.getElementById(`${moduleId}-module`).classList.add('active');
+    });
+  });
+  
+  // Éléments DOM pour la calculatrice
   const screen = document.getElementById('screen');
   const historyDisplay = document.getElementById('history');
   const buttons = document.querySelectorAll('.btn');
@@ -24,6 +49,11 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Gérer les entrées clavier
   document.addEventListener('keydown', (event) => {
+    // Vérifier si le module calculatrice est actif
+    if (!document.getElementById('calculator-module').classList.contains('active')) {
+      return;
+    }
+    
     const key = event.key;
     
     if (/[0-9]/.test(key)) {

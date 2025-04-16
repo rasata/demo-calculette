@@ -3,20 +3,65 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calculatrice Scientifique</title>
+  <title>Application Multi-fonctions</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Calculatrice Scientifique</h1>
-    <div class="calculator-wrapper">
-      <div class="calculator">
-        <div class="display">
-          <div id="history" class="history"></div>
-          <div id="screen" class="screen">0</div>
-        </div>
-        
-        <div class="buttons">
+  <!-- Header fixe -->
+  <header class="app-header">
+    <div class="logo">
+      <h1>MonApp</h1>
+    </div>
+    <div class="user-profile">
+      <span class="username">Utilisateur</span>
+      <div class="avatar">
+        <i class="fas fa-user-circle"></i>
+      </div>
+    </div>
+  </header>
+
+  <!-- Layout principal -->
+  <div class="app-container">
+    <!-- Barre latérale avec icônes -->
+    <nav class="sidebar">
+      <ul class="sidebar-menu">
+        <li class="sidebar-item active" data-module="calculator">
+          <i class="fas fa-calculator"></i>
+          <span class="sidebar-label">Calculatrice</span>
+        </li>
+        <li class="sidebar-item" data-module="feature1">
+          <i class="fas fa-chart-line"></i>
+          <span class="sidebar-label">Graphiques</span>
+        </li>
+        <li class="sidebar-item" data-module="feature2">
+          <i class="fas fa-clock"></i>
+          <span class="sidebar-label">Chronomètre</span>
+        </li>
+        <li class="sidebar-item" data-module="feature3">
+          <i class="fas fa-calendar-alt"></i>
+          <span class="sidebar-label">Calendrier</span>
+        </li>
+        <li class="sidebar-item" data-module="settings">
+          <i class="fas fa-cog"></i>
+          <span class="sidebar-label">Paramètres</span>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Contenu principal -->
+    <main class="main-content">
+      <!-- Module Calculatrice -->
+      <div class="module-container active" id="calculator-module">
+        <h2 class="module-title">Calculatrice Scientifique</h2>
+        <div class="calculator-wrapper">
+          <div class="calculator">
+            <div class="display">
+              <div id="history" class="history"></div>
+              <div id="screen" class="screen">0</div>
+            </div>
+            
+            <div class="buttons">
         <!-- Première rangée - Fonctions scientifiques -->
         <button class="btn function" data-value="clear">C</button>
         <button class="btn function" data-value="negate">±</button>
@@ -45,22 +90,53 @@
         <button class="btn number zero" data-value="0">0</button>
         <button class="btn number" data-value=".">.</button>
         <button class="btn equals" data-value="=">=</button>
+          </div>
+          </div>
+          
+          <!-- Fonctions scientifiques supplémentaires -->
+          <div class="scientific-buttons">
+            <button class="btn scientific" data-value="sin">sin</button>
+            <button class="btn scientific" data-value="cos">cos</button>
+            <button class="btn scientific" data-value="tan">tan</button>
+            <button class="btn scientific" data-value="sqrt">√</button>
+            <button class="btn scientific" data-value="square">x²</button>
+            <button class="btn scientific" data-value="log">log</button>
+            <button class="btn scientific" data-value="(">(</button>
+            <button class="btn scientific" data-value=")">)</button>
+            <button class="btn scientific" data-value="pi">π</button>
+          </div>
+        </div>
       </div>
+
+      <!-- Autres modules (vides pour l'instant) -->
+      <div class="module-container" id="feature1-module">
+        <h2 class="module-title">Graphiques</h2>
+        <div class="module-content">
+          <p>Module de graphiques à venir...</p>
+        </div>
       </div>
-      
-      <!-- Fonctions scientifiques supplémentaires -->
-      <div class="scientific-buttons">
-        <button class="btn scientific" data-value="sin">sin</button>
-        <button class="btn scientific" data-value="cos">cos</button>
-        <button class="btn scientific" data-value="tan">tan</button>
-        <button class="btn scientific" data-value="sqrt">√</button>
-        <button class="btn scientific" data-value="square">x²</button>
-        <button class="btn scientific" data-value="log">log</button>
-        <button class="btn scientific" data-value="(">(</button>
-        <button class="btn scientific" data-value=")">)</button>
-        <button class="btn scientific" data-value="pi">π</button>
+
+      <div class="module-container" id="feature2-module">
+        <h2 class="module-title">Chronomètre</h2>
+        <div class="module-content">
+          <p>Module de chronomètre à venir...</p>
+        </div>
       </div>
-    </div>
+
+      <div class="module-container" id="feature3-module">
+        <h2 class="module-title">Calendrier</h2>
+        <div class="module-content">
+          <p>Module de calendrier à venir...</p>
+        </div>
+      </div>
+
+      <div class="module-container" id="settings-module">
+        <h2 class="module-title">Paramètres</h2>
+        <div class="module-content">
+          <p>Paramètres de l'application à venir...</p>
+        </div>
+      </div>
+    </main>
   </div>
   
   <script src="app.js"></script>
