@@ -137,11 +137,46 @@ new Vue({
     
     applyFunction(func) {
       try {
+        // Vérifier si la valeur est un nombre valide
+        if (isNaN(parseFloat(this.display))) {
+          this.display = 'Error';
+          return;
+        }
+        
         const value = parseFloat(this.display);
-        const result = eval(`${func}(${value})`);
+        let result;
+        
+        // Utiliser des fonctions directes au lieu de eval
+        switch(func) {
+          case 'Math.sin':
+            result = Math.sin(value);
+            break;
+          case 'Math.cos':
+            result = Math.cos(value);
+            break;
+          case 'Math.tan':
+            result = Math.tan(value);
+            break;
+          case 'Math.log10':
+            result = Math.log10(value);
+            break;
+          case 'Math.sqrt':
+            result = Math.sqrt(value);
+            break;
+          default:
+            throw new Error('Fonction non supportée');
+        }
+        
+        // Vérifier si le résultat est valide
+        if (isNaN(result) || !isFinite(result)) {
+          this.display = 'Error';
+          return;
+        }
+        
         this.display = result.toString();
         this.waitingForOperand = true;
       } catch (e) {
+        console.error('Erreur fonction:', e.message);
         this.display = 'Error';
       }
     },
@@ -179,23 +214,41 @@ new Vue({
     
     calculate() {
       try {
+        // Vérifier si l'affichage est vide ou contient seulement un opérateur
+        if (this.display === '0' || /^[+\-*/%]$/.test(this.display)) {
+          return;
+        }
+        
+        // Vérifier et corriger les expressions incomplètes
+        let expression = this.display;
+        
+        // Supprimer l'opérateur final s'il est seul
+        if (/[+\-*/%]$/.test(expression)) {
+          expression = expression.slice(0, -1);
+        }
+        
         // Remplacer les opérateurs visuels par ceux compris par JavaScript
-        let expression = this.display
+        expression = expression
           .replace(/×/g, '*')
           .replace(/÷/g, '/');
+        
+        console.log('Expression à calculer:', expression);
         
         // Utiliser le backend pour calculer
         axios.post('/api/calculate', { expression })
           .then(response => {
+            console.log('Réponse du serveur:', response.data);
             const result = response.data.result;
             this.history.push(`${this.display} = ${result}`);
             this.display = result.toString();
             this.waitingForOperand = true;
           })
           .catch(error => {
+            console.error('Erreur de calcul:', error.response ? error.response.data : error.message);
             this.display = 'Error';
           });
       } catch (e) {
+        console.error('Exception:', e.message);
         this.display = 'Error';
       }
     }

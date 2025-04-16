@@ -15,12 +15,33 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.post('/api/calculate', (req, res) => {
   try {
     const { expression } = req.body;
+    
+    // Vérifier si l'expression est vide ou invalide
+    if (!expression || typeof expression !== 'string') {
+      return res.status(400).json({ error: 'Expression invalide' });
+    }
+    
+    // Nettoyer l'expression pour éviter les injections
+    let cleanExpression = expression
+      .replace(/[^0-9+\-*/().%\s]/g, '')  // Ne garder que les caractères sûrs
+      .replace(/\s+/g, '');                // Supprimer les espaces
+    
+    // Vérifier si l'expression est vide après nettoyage
+    if (!cleanExpression) {
+      return res.status(400).json({ error: 'Expression invalide après nettoyage' });
+    }
+    
     // Évaluer l'expression mathématique (avec précaution)
-    // Note: eval() est utilisé ici pour simplifier, mais dans un environnement de production,
-    // il faudrait utiliser une bibliothèque sécurisée comme math.js
-    const result = Function('"use strict";return (' + expression + ')')();
+    const result = Function('"use strict";return (' + cleanExpression + ')')();
+    
+    // Vérifier si le résultat est un nombre valide
+    if (isNaN(result) || !isFinite(result)) {
+      return res.status(400).json({ error: 'Résultat non valide' });
+    }
+    
     res.json({ result });
   } catch (error) {
+    console.error('Erreur de calcul:', error.message);
     res.status(400).json({ error: 'Expression invalide' });
   }
 });
