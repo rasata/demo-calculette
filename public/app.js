@@ -1,256 +1,280 @@
-new Vue({
-  el: '#app',
-  data: {
-    display: '0',
-    currentOperation: null,
-    previousValue: null,
-    waitingForOperand: false,
-    history: [],
-    scientificMode: true
-  },
-  computed: {
-    scientificButtons() {
-      return [
-        { label: 'sin', value: 'sin', type: 'btn-primary' },
-        { label: 'cos', value: 'cos', type: 'btn-primary' },
-        { label: 'tan', value: 'tan', type: 'btn-primary' },
-        { label: '÷', value: '/', type: 'btn-secondary' },
-        { label: 'x²', value: 'square', type: 'btn-primary' },
-        { label: '√', value: 'sqrt', type: 'btn-primary' },
-        { label: 'log', value: 'log', type: 'btn-primary' },
-        { label: '×', value: '*', type: 'btn-secondary' },
-        { label: '(', value: '(', type: 'btn-primary' },
-        { label: ')', value: ')', type: 'btn-primary' },
-        { label: 'π', value: 'pi', type: 'btn-primary' },
-        { label: '-', value: '-', type: 'btn-secondary' }
-      ];
-    },
-    numericButtons() {
-      return [
-        { label: '7', value: '7', type: 'btn-light' },
-        { label: '8', value: '8', type: 'btn-light' },
-        { label: '9', value: '9', type: 'btn-light' },
-        { label: '+', value: '+', type: 'btn-secondary' },
-        { label: '4', value: '4', type: 'btn-light' },
-        { label: '5', value: '5', type: 'btn-light' },
-        { label: '6', value: '6', type: 'btn-light' },
-        { label: '%', value: '%', type: 'btn-secondary' },
-        { label: '1', value: '1', type: 'btn-light' },
-        { label: '2', value: '2', type: 'btn-light' },
-        { label: '3', value: '3', type: 'btn-light' },
-        { label: '±', value: 'negate', type: 'btn-secondary' },
-        { label: '0', value: '0', type: 'btn-light' },
-        { label: '.', value: '.', type: 'btn-light' },
-        { label: 'DEL', value: 'backspace', type: 'btn-warning' },
-        { label: 'Ans', value: 'ans', type: 'btn-info' }
-      ];
+document.addEventListener('DOMContentLoaded', function() {
+  // Éléments DOM
+  const screen = document.getElementById('screen');
+  const historyDisplay = document.getElementById('history');
+  const buttons = document.querySelectorAll('.btn');
+  
+  // Variables d'état
+  let currentInput = '0';
+  let previousInput = '';
+  let calculationHistory = [];
+  let waitingForOperand = false;
+  let lastResult = null;
+  
+  // Initialiser l'affichage
+  updateDisplay();
+  
+  // Ajouter les écouteurs d'événements aux boutons
+  buttons.forEach(button => {
+    button.addEventListener('click', () => {
+      const value = button.getAttribute('data-value');
+      handleButtonClick(value);
+    });
+  });
+  
+  // Gérer les entrées clavier
+  document.addEventListener('keydown', (event) => {
+    const key = event.key;
+    
+    if (/[0-9]/.test(key)) {
+      handleButtonClick(key);
+    } else if (key === '+' || key === '-' || key === '*' || key === '/') {
+      handleButtonClick(key);
+    } else if (key === 'Enter' || key === '=') {
+      handleButtonClick('=');
+    } else if (key === 'Escape') {
+      handleButtonClick('clear');
+    } else if (key === 'Backspace') {
+      handleButtonClick('backspace');
+    } else if (key === '.') {
+      handleButtonClick('.');
+    } else if (key === '%') {
+      handleButtonClick('%');
     }
-  },
-  methods: {
-    handleButtonClick(value) {
-      // Si on attend un opérande et qu'on entre un chiffre, on efface l'affichage
-      if (this.waitingForOperand && /[0-9]/.test(value)) {
-        this.display = '';
-        this.waitingForOperand = false;
+  });
+  
+  // Fonction principale pour gérer les clics de boutons
+  function handleButtonClick(value) {
+    // Si on attend un opérande et qu'on entre un chiffre, on efface l'affichage
+    if (waitingForOperand && /[0-9]/.test(value)) {
+      currentInput = '';
+      waitingForOperand = false;
+    }
+    
+    switch (value) {
+      case 'clear':
+        clearAll();
+        break;
+      case 'backspace':
+        backspace();
+        break;
+      case 'negate':
+        negate();
+        break;
+      case '+':
+      case '-':
+      case '*':
+      case '/':
+      case '%':
+        handleOperator(value);
+        break;
+      case '=':
+        calculate();
+        break;
+      case 'sin':
+      case 'cos':
+      case 'tan':
+      case 'log':
+        applyMathFunction(value);
+        break;
+      case 'sqrt':
+        applyMathFunction('sqrt');
+        break;
+      case 'square':
+        square();
+        break;
+      case 'pi':
+        insertPi();
+        break;
+      case '(':
+      case ')':
+        addParenthesis(value);
+        break;
+      default:
+        // Pour les chiffres et le point décimal
+        if (currentInput === '0' && value !== '.') {
+          currentInput = value;
+        } else if (value === '.' && currentInput.includes('.')) {
+          // Éviter les points décimaux multiples
+          return;
+        } else {
+          currentInput += value;
+        }
+        break;
+    }
+    
+    updateDisplay();
+  }
+  
+  // Mettre à jour l'affichage
+  function updateDisplay() {
+    // Limiter la longueur pour éviter le débordement
+    let displayValue = currentInput;
+    if (displayValue.length > 12) {
+      displayValue = parseFloat(displayValue).toExponential(6);
+    }
+    
+    screen.textContent = displayValue;
+    
+    // Afficher l'historique
+    if (calculationHistory.length > 0) {
+      historyDisplay.textContent = calculationHistory[calculationHistory.length - 1];
+    } else {
+      historyDisplay.textContent = '';
+    }
+  }
+  
+  // Fonctions de la calculatrice
+  function clearAll() {
+    currentInput = '0';
+    previousInput = '';
+    waitingForOperand = false;
+  }
+  
+  function backspace() {
+    if (currentInput.length > 1) {
+      currentInput = currentInput.slice(0, -1);
+    } else {
+      currentInput = '0';
+    }
+  }
+  
+  function negate() {
+    if (currentInput !== '0') {
+      if (currentInput.startsWith('-')) {
+        currentInput = currentInput.substring(1);
+      } else {
+        currentInput = '-' + currentInput;
       }
-
-      switch (value) {
-        case '+':
-        case '-':
-        case '*':
-        case '/':
-        case '%':
-          this.handleOperator(value);
-          break;
-        case 'backspace':
-          this.backspace();
-          break;
-        case 'negate':
-          this.negate();
-          break;
+    }
+  }
+  
+  function handleOperator(operator) {
+    // Si l'entrée se termine déjà par un opérateur, le remplacer
+    if (/[+\-*/%]$/.test(currentInput)) {
+      currentInput = currentInput.slice(0, -1) + operator;
+    } else {
+      currentInput += operator;
+    }
+    waitingForOperand = false;
+  }
+  
+  function calculate() {
+    try {
+      // Vérifier si l'expression est valide
+      if (currentInput === '0' || /^[+\-*/%]$/.test(currentInput)) {
+        return;
+      }
+      
+      // Supprimer l'opérateur final s'il est seul
+      let expression = currentInput;
+      if (/[+\-*/%]$/.test(expression)) {
+        expression = expression.slice(0, -1);
+      }
+      
+      // Évaluer l'expression localement
+      // Note: Dans une application réelle, il serait préférable d'utiliser une bibliothèque comme math.js
+      const result = evaluateExpression(expression);
+      
+      // Enregistrer dans l'historique
+      calculationHistory.push(`${currentInput} = ${result}`);
+      if (calculationHistory.length > 5) {
+        calculationHistory.shift(); // Garder seulement les 5 derniers calculs
+      }
+      
+      lastResult = result;
+      previousInput = currentInput;
+      currentInput = result.toString();
+      waitingForOperand = true;
+    } catch (error) {
+      currentInput = 'Error';
+      console.error('Erreur de calcul:', error);
+    }
+  }
+  
+  // Fonction sécurisée pour évaluer les expressions
+  function evaluateExpression(expression) {
+    // Remplacer les fonctions mathématiques
+    expression = expression
+      .replace(/sin\(([^)]+)\)/g, (_, p1) => Math.sin(parseFloat(p1)))
+      .replace(/cos\(([^)]+)\)/g, (_, p1) => Math.cos(parseFloat(p1)))
+      .replace(/tan\(([^)]+)\)/g, (_, p1) => Math.tan(parseFloat(p1)))
+      .replace(/log\(([^)]+)\)/g, (_, p1) => Math.log10(parseFloat(p1)))
+      .replace(/sqrt\(([^)]+)\)/g, (_, p1) => Math.sqrt(parseFloat(p1)));
+    
+    // Utiliser Function pour évaluer l'expression (plus sûr que eval)
+    return Function('"use strict"; return (' + expression + ')')();
+  }
+  
+  function applyMathFunction(func) {
+    try {
+      // Vérifier si la valeur est un nombre valide
+      const value = parseFloat(currentInput);
+      if (isNaN(value)) {
+        currentInput = 'Error';
+        return;
+      }
+      
+      let result;
+      switch(func) {
         case 'sin':
-          this.applyFunction('Math.sin');
+          result = Math.sin(value);
           break;
         case 'cos':
-          this.applyFunction('Math.cos');
+          result = Math.cos(value);
           break;
         case 'tan':
-          this.applyFunction('Math.tan');
+          result = Math.tan(value);
           break;
         case 'log':
-          this.applyFunction('Math.log10');
+          result = Math.log10(value);
           break;
         case 'sqrt':
-          this.applyFunction('Math.sqrt');
-          break;
-        case 'square':
-          this.square();
-          break;
-        case 'pi':
-          this.insertPi();
-          break;
-        case 'ans':
-          this.useLastResult();
+          result = Math.sqrt(value);
           break;
         default:
-          // Pour les chiffres et autres caractères
-          if (this.display === '0' && value !== '.') {
-            this.display = value;
-          } else {
-            this.display += value;
-          }
+          throw new Error('Fonction non supportée');
       }
-    },
-    
-    handleOperator(operator) {
-      this.waitingForOperand = true;
-      if (this.display.slice(-1).match(/[+\-*/%]/)) {
-        // Remplacer l'opérateur existant
-        this.display = this.display.slice(0, -1) + operator;
-      } else {
-        this.display += operator;
+      
+      // Vérifier si le résultat est valide
+      if (isNaN(result) || !isFinite(result)) {
+        currentInput = 'Error';
+        return;
       }
-    },
-    
-    clearDisplay() {
-      this.display = '0';
-      this.waitingForOperand = false;
-    },
-    
-    backspace() {
-      if (this.display.length > 1) {
-        this.display = this.display.slice(0, -1);
-      } else {
-        this.display = '0';
-      }
-    },
-    
-    negate() {
-      if (this.display !== '0') {
-        if (this.display.startsWith('-')) {
-          this.display = this.display.substring(1);
-        } else {
-          this.display = '-' + this.display;
-        }
-      }
-    },
-    
-    applyFunction(func) {
-      try {
-        // Vérifier si la valeur est un nombre valide
-        if (isNaN(parseFloat(this.display))) {
-          this.display = 'Error';
-          return;
-        }
-        
-        const value = parseFloat(this.display);
-        let result;
-        
-        // Utiliser des fonctions directes au lieu de eval
-        switch(func) {
-          case 'Math.sin':
-            result = Math.sin(value);
-            break;
-          case 'Math.cos':
-            result = Math.cos(value);
-            break;
-          case 'Math.tan':
-            result = Math.tan(value);
-            break;
-          case 'Math.log10':
-            result = Math.log10(value);
-            break;
-          case 'Math.sqrt':
-            result = Math.sqrt(value);
-            break;
-          default:
-            throw new Error('Fonction non supportée');
-        }
-        
-        // Vérifier si le résultat est valide
-        if (isNaN(result) || !isFinite(result)) {
-          this.display = 'Error';
-          return;
-        }
-        
-        this.display = result.toString();
-        this.waitingForOperand = true;
-      } catch (e) {
-        console.error('Erreur fonction:', e.message);
-        this.display = 'Error';
-      }
-    },
-    
-    square() {
-      try {
-        const value = parseFloat(this.display);
-        this.display = (value * value).toString();
-        this.waitingForOperand = true;
-      } catch (e) {
-        this.display = 'Error';
-      }
-    },
-    
-    insertPi() {
-      if (this.display === '0' || this.waitingForOperand) {
-        this.display = Math.PI.toString();
-        this.waitingForOperand = false;
-      } else {
-        this.display += Math.PI.toString();
-      }
-    },
-    
-    useLastResult() {
-      if (this.history.length > 0) {
-        const lastResult = this.history[this.history.length - 1].split('=')[1].trim();
-        if (this.display === '0' || this.waitingForOperand) {
-          this.display = lastResult;
-          this.waitingForOperand = false;
-        } else {
-          this.display += lastResult;
-        }
-      }
-    },
-    
-    calculate() {
-      try {
-        // Vérifier si l'affichage est vide ou contient seulement un opérateur
-        if (this.display === '0' || /^[+\-*/%]$/.test(this.display)) {
-          return;
-        }
-        
-        // Vérifier et corriger les expressions incomplètes
-        let expression = this.display;
-        
-        // Supprimer l'opérateur final s'il est seul
-        if (/[+\-*/%]$/.test(expression)) {
-          expression = expression.slice(0, -1);
-        }
-        
-        // Remplacer les opérateurs visuels par ceux compris par JavaScript
-        expression = expression
-          .replace(/×/g, '*')
-          .replace(/÷/g, '/');
-        
-        console.log('Expression à calculer:', expression);
-        
-        // Utiliser le backend pour calculer
-        axios.post('/api/calculate', { expression })
-          .then(response => {
-            console.log('Réponse du serveur:', response.data);
-            const result = response.data.result;
-            this.history.push(`${this.display} = ${result}`);
-            this.display = result.toString();
-            this.waitingForOperand = true;
-          })
-          .catch(error => {
-            console.error('Erreur de calcul:', error.response ? error.response.data : error.message);
-            this.display = 'Error';
-          });
-      } catch (e) {
-        console.error('Exception:', e.message);
-        this.display = 'Error';
-      }
+      
+      currentInput = result.toString();
+      waitingForOperand = true;
+    } catch (error) {
+      currentInput = 'Error';
+      console.error('Erreur fonction:', error);
+    }
+  }
+  
+  function square() {
+    try {
+      const value = parseFloat(currentInput);
+      const result = value * value;
+      currentInput = result.toString();
+      waitingForOperand = true;
+    } catch (error) {
+      currentInput = 'Error';
+    }
+  }
+  
+  function insertPi() {
+    if (currentInput === '0' || waitingForOperand) {
+      currentInput = Math.PI.toString();
+      waitingForOperand = false;
+    } else {
+      currentInput += Math.PI.toString();
+    }
+  }
+  
+  function addParenthesis(parenthesis) {
+    if (currentInput === '0') {
+      currentInput = parenthesis;
+    } else {
+      currentInput += parenthesis;
     }
   }
 });

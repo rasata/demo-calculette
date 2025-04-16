@@ -4,56 +4,59 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Calculatrice Scientifique</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
-  <div id="app">
-    <div class="container">
-      <h1 class="text-center my-4">Calculatrice Scientifique</h1>
-      <div class="calculator-container">
-        <div class="calculator">
-          <div class="display">
-            <input type="text" class="form-control mb-2" v-model="display" readonly>
-            <div class="history" v-if="history.length > 0">
-              <small class="text-muted">{{ history[history.length - 1] }}</small>
-            </div>
-          </div>
-          
-          <div class="buttons">
-            <div class="row g-2">
-              <div class="col-3" v-for="btn in scientificButtons">
-                <button 
-                  :class="['btn', btn.type]" 
-                  @click="handleButtonClick(btn.value)"
-                  :disabled="btn.disabled">
-                  {{ btn.label }}
-                </button>
-              </div>
-            </div>
-            
-            <div class="row g-2 mt-2">
-              <div class="col-3" v-for="btn in numericButtons">
-                <button 
-                  :class="['btn', btn.type]" 
-                  @click="handleButtonClick(btn.value)">
-                  {{ btn.label }}
-                </button>
-              </div>
-            </div>
-            
-            <div class="row g-2 mt-2">
-              <div class="col-6">
-                <button class="btn btn-danger w-100" @click="clearDisplay">C</button>
-              </div>
-              <div class="col-6">
-                <button class="btn btn-success w-100" @click="calculate">=</button>
-              </div>
-            </div>
-          </div>
-        </div>
+  <div class="container">
+    <h1>Calculatrice Scientifique</h1>
+    <div class="calculator">
+      <div class="display">
+        <div id="history" class="history"></div>
+        <div id="screen" class="screen">0</div>
+      </div>
+      
+      <div class="buttons">
+        <!-- Première rangée - Fonctions scientifiques -->
+        <button class="btn function" data-value="clear">C</button>
+        <button class="btn function" data-value="negate">±</button>
+        <button class="btn function" data-value="%">%</button>
+        <button class="btn operator" data-value="/">÷</button>
+        
+        <!-- Deuxième rangée -->
+        <button class="btn number" data-value="7">7</button>
+        <button class="btn number" data-value="8">8</button>
+        <button class="btn number" data-value="9">9</button>
+        <button class="btn operator" data-value="*">×</button>
+        
+        <!-- Troisième rangée -->
+        <button class="btn number" data-value="4">4</button>
+        <button class="btn number" data-value="5">5</button>
+        <button class="btn number" data-value="6">6</button>
+        <button class="btn operator" data-value="-">−</button>
+        
+        <!-- Quatrième rangée -->
+        <button class="btn number" data-value="1">1</button>
+        <button class="btn number" data-value="2">2</button>
+        <button class="btn number" data-value="3">3</button>
+        <button class="btn operator" data-value="+">+</button>
+        
+        <!-- Cinquième rangée -->
+        <button class="btn number zero" data-value="0">0</button>
+        <button class="btn number" data-value=".">.</button>
+        <button class="btn equals" data-value="=">=</button>
+      </div>
+      
+      <!-- Fonctions scientifiques supplémentaires -->
+      <div class="scientific-buttons">
+        <button class="btn scientific" data-value="sin">sin</button>
+        <button class="btn scientific" data-value="cos">cos</button>
+        <button class="btn scientific" data-value="tan">tan</button>
+        <button class="btn scientific" data-value="sqrt">√</button>
+        <button class="btn scientific" data-value="square">x²</button>
+        <button class="btn scientific" data-value="log">log</button>
+        <button class="btn scientific" data-value="(">(</button>
+        <button class="btn scientific" data-value=")">)</button>
+        <button class="btn scientific" data-value="pi">π</button>
       </div>
     </div>
   </div>
